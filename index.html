@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Investigación Forense y Juzgado Penal - Entrega 2</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- ENCABEZADO Y MENU PRINCIPAL -->
+    <header class="top-header">
+        <div class="titulo-central">
+            <h1>SISTEMA DE INVESTIGACIÓN FORENSE Y JUZGADO PENAL</h1>
+            <p>Motor C++ Multiplataforma (Windows / Linux) • Cola con Prioridad • Pila • Cola Circular • Árbol • Montículo Binario</p>
+        </div>
+        <div class="acciones-header">
+            <span id="badge-instancia" class="badge-instancia modo-noche">🌙 INSTANCIA DE NOCHE: INVESTIGADOR</span>
+            <button onclick="abrirModalCrearCaso()" class="btn-menu-caso">➕ Ingresar Nuevo Caso</button>
+        </div>
+    </header>
+
+    <!-- BANNER DE ESTADO -->
+    <div id="banner-mensaje" class="banner">Conectando con el servidor C++ en http://localhost:8080...</div>
+
+    <!-- BARRA SUPERIOR DE GESTIÓN: COLA CON PRIORIDAD Y PLANTILLA DE DETECTIVES -->
+    <section class="barra-estructuras">
+        <div class="panel-compacto">
+            <div class="cabecera-panel">
+                <h2>📋 Cola con Prioridad de Casos</h2>
+                <span class="sub">Ordenados por urgencia (1: Alta, 2: Media, 3: Baja)</span>
+            </div>
+            <div id="lista-casos" class="ira-casos"></div>
+        </div>
+
+        <div class="panel-compacto">
+            <div class="cabecera-panel">
+                <h2>🕵️ Plantilla de Detectives (Arreglo Fijo)</h2>
+                <span class="sub">Haz clic en un detective disponible para asignarlo al caso activo</span>
+            </div>
+            <div id="lista-detectives" class="ira-detectives"></div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         INSTANCIA 1: MESA DE NOCHE (ROL DE INVESTIGADOR - BOCETO DERECHO)
+         ===================================================================== -->
+    <main id="vista-noche" class="escenario-juego">
+        <div class="cabecera-escenario">
+            <div>
+                <h2>🌙 Fase Nocturna: Perfilamiento en la Escena del Crimen</h2>
+                <p>Inspecciona a los 5 individuos, recolecta pistas en la <b>Pila</b> y selecciona exactamente <b>2 Sospechosos</b> (naranja). Los otros <b>3 pasarán a ser Testigos</b> (amarillo).</p>
+            </div>
+            <div class="contador-roles" id="contador-seleccion-noche">
+                Sospechosos: 0/2 | Testigos: 5/3
+            </div>
+        </div>
+
+        <!-- Marco Superior Derecho: Foto del Sospechoso Inspeccionado -->
+        <div class="fila-superior-noche">
+            <div class="resumen-caso-noche" id="info-expediente-noche">
+                <h3>Expediente Activo</h3>
+                <p>Selecciona un caso y asigna un detective para comenzar.</p>
+            </div>
+
+            <div class="marco-foto-sospechoso">
+                <div class="etiqueta-boceto">Foto Sospechoso / Individuo</div>
+                <div class="contenedor-retrato" id="retrato-inspeccionado">
+                    <!-- Se renderiza el sprite o silueta aqui -->
+                </div>
+                <div class="datos-inspeccionado" id="datos-inspeccionado">
+                    <strong>Selecciona un individuo</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablero Principal de la Noche (5 Individuos con Contexto + Pistas Geométricas + Jugador) -->
+        <div class="tablero-mesa-noche">
+            <!-- Recuadro Izquierdo: Los 5 Individuos y su Contexto -->
+            <div class="caja-contextos-noche">
+                <div class="titulo-caja-interna">Individuos en la Escena del Crimen (5)</div>
+                <div id="lista-individuos-noche" class="lista-individuos-boceto">
+                    <!-- 5 filas con icono amarillo/naranja + flecha azul + contexto + boton -->
+                </div>
+            </div>
+
+            <!-- Recuadro Derecho: Pistas (Pila) con figuras geometricas del boceto -->
+            <div class="caja-pistas-noche">
+                <h3 class="titulo-pistas-boceto">Pistas</h3>
+                <p class="sub-centrado">Haz clic en el botón para apilar una nueva pista en la <b>Pila</b>, o haz clic sobre una figura revelada para leer su detalle.</p>
+
+                <div class="figuras-pistas-boceto" id="figuras-pistas">
+                    <!-- Rectangulo, Rombo, Cuadrado, Reporte -->
+                </div>
+
+                <button onclick="solicitarEvidencia()" class="btn-recolectar-pila">
+                    🔍 Procesar y Apilar Nueva Evidencia en la Pila
+                </button>
+
+                <div id="pila-evidencias" class="pila-historial-box"></div>
+            </div>
+
+            <!-- Circulo Inferior: Jugador (Investigador) y Boton de Transicion al Dia -->
+            <div class="circulo-jugador-contenedor">
+                <div class="circulo-jugador">
+                    <span>Jugador</span>
+                    <small>(Investigador)</small>
+                    <button onclick="pasarAlDia()" class="btn-pasar-dia">
+                        ☀️ Pasar al Día (Juzgado)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =====================================================================
+         INSTANCIA 2: SALA DE JUZGADO EN EL DÍA (ROL DE JUEZ - BOCETO IZQUIERDO)
+         ===================================================================== -->
+    <main id="vista-dia" class="escenario-juego oculto">
+        <div class="cabecera-escenario cabecera-dia">
+            <div>
+                <h2>☀️ Fase Diurna: Audiencia en el Juzgado Penal (Rol: Juez)</h2>
+                <p>Orden de la <b>Cola Circular</b>: Primero <b>[1] Contexto de Testigos</b>, luego <b>[2] Evidencias de cada Abogado</b> y finalmente <b>[3] Acusación de cada Sospechoso</b>. Haz clic en cada carta para consultar el <b>Árbol</b> e insertarla en el <b>Montículo Binario</b>.</p>
+            </div>
+            <div class="indicador-turno-circular" id="indicador-turno-dia">
+                Turno actual: Etapa 1
+            </div>
+        </div>
+
+        <!-- Estrado de Personajes (Sprites con animacion de dar un paso al frente) -->
+        <div class="estrado-personajes-dia">
+            <!-- Grupo 1: Sospechoso A (Naranja) y Abogado A (Azul) -->
+            <div class="grupo-estrado" id="estrado-grupo-a">
+                <div class="personaje-sprite color-naranja" id="sprite-sospechoso-a">
+                    <div class="figura-humana">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <span class="nombre-sprite" id="lbl-sosp-a">Sospechoso A</span>
+                    <small class="rol-sprite">Acusado (3)</small>
+                </div>
+                <div class="personaje-sprite color-azul" id="sprite-abogado-a">
+                    <div class="figura-humana">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <span class="nombre-sprite" id="lbl-abog-a">Abogado A</span>
+                    <small class="rol-sprite">Defensa (2)</small>
+                </div>
+            </div>
+
+            <!-- Grupo Central: Los 3 Testigos (Amarillo) -->
+            <div class="grupo-estrado grupo-testigos-centro" id="sprite-testigos">
+                <div class="trio-testigos">
+                    <div class="figura-humana mini-testigo">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <div class="figura-humana mini-testigo">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <div class="figura-humana mini-testigo">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                </div>
+                <span class="nombre-sprite">Panel de 3 Testigos (1)</span>
+                <small class="rol-sprite" id="lbl-nombres-testigos">Testigos de la escena</small>
+            </div>
+
+            <!-- Grupo 2: Abogado B (Rosado) y Sospechoso B (Naranja) -->
+            <div class="grupo-estrado" id="estrado-grupo-b">
+                <div class="personaje-sprite color-rosado" id="sprite-abogado-b">
+                    <div class="figura-humana">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <span class="nombre-sprite" id="lbl-abog-b">Abogado B</span>
+                    <small class="rol-sprite">Defensa (2)</small>
+                </div>
+                <div class="personaje-sprite color-naranja" id="sprite-sospechoso-b">
+                    <div class="figura-humana">
+                        <div class="cabeza-humana"></div>
+                        <div class="cuerpo-humano"></div>
+                    </div>
+                    <span class="nombre-sprite" id="lbl-sosp-b">Sospechoso B</span>
+                    <small class="rol-sprite">Acusado (3)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mesa del Juzgado con las 8 Cartas Probatorias (3, 2, 2, 1 | 1, 2, 2, 3) -->
+        <div class="tablero-mesa-dia">
+            <div class="fila-cartas-juzgado" id="contenedor-cartas-mesa">
+                <!-- Se renderizan las 8 cartas exactas del boceto 2 -->
+            </div>
+
+            <!-- Panel de lectura de la prueba seleccionada al hacer clic -->
+            <div class="visor-prueba-activa" id="visor-prueba-dia">
+                <h4 id="titulo-prueba-activa">Haz clic sobre una carta disponible en la mesa para examinar su contenido</h4>
+                <p id="texto-prueba-activa">La información detallada del nodo del Árbol aparecerá aquí.</p>
+            </div>
+
+            <!-- Nota manuscrita del boceto y botones de Veredicto -->
+            <div class="zona-veredicto-boceto">
+                <p class="nota-roja-boceto">
+                    "Después de todas las evidencias se da un veredicto (se escoge un culpable)"
+                </p>
+                <div class="botones-veredicto">
+                    <button id="btn-condenar-a" class="btn-veredicto" onclick="emitirVeredicto('A')">
+                        ⚖️ Declarar Culpable a Sospechoso A
+                    </button>
+                    <button id="btn-condenar-b" class="btn-veredicto" onclick="emitirVeredicto('B')">
+                        ⚖️ Declarar Culpable a Sospechoso B
+                    </button>
+                </div>
+            </div>
+
+            <!-- Circulo Inferior: Jugador (Juez) -->
+            <div class="circulo-jugador-contenedor">
+                <div class="circulo-jugador circulo-juez">
+                    <span>Jugador</span>
+                    <small>(Juez)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel del Montículo Binario (Opción B: Ranking automático de pruebas reveladas) -->
+        <section class="panel-monticulo">
+            <div class="cabecera-panel">
+                <h3>🔺 Montículo Binario: Ranking de Pruebas Reveladas por Peso Incriminatorio</h3>
+                <span class="sub">Cada vez que haces clic en una carta de la mesa (1, 2 o 3), se inserta en el Montículo Binario y se ordena de mayor a menor peso</span>
+            </div>
+            <div id="lista-monticulo" class="lista-monticulo-grid"></div>
+        </section>
+    </main>
+
+    <!-- =====================================================================
+         MODAL DE DETALLE DE PRUEBA / ALERTA DE TRANSICIÓN
+         ===================================================================== -->
+    <div id="modal-info" class="modal-overlay oculto">
+        <div class="modal-caja">
+            <h3 id="modal-info-titulo">Detalle de Prueba</h3>
+            <p id="modal-info-texto"></p>
+            <button onclick="cerrarModalInfo()" class="btn-cerrar-modal">Entendido</button>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL DEL MENÚ PARA INGRESAR NUEVOS CASOS PERSONALIZADOS
+         ===================================================================== -->
+    <div id="modal-crear-caso" class="modal-overlay oculto">
+        <div class="modal-caja modal-grande">
+            <div class="cabecera-modal">
+                <h3>➕ Ingresar Nuevo Caso al Sistema (Cola con Prioridad)</h3>
+                <button onclick="cerrarModalCrearCaso()" class="btn-x">✖</button>
+            </div>
+            <p class="sub">Define los datos del expediente, los 5 individuos de la noche (los sprites se mantienen fijos), cuál es el culpable y las 4 pistas de la Pila.</p>
+
+            <form id="form-nuevo-caso" onsubmit="enviarNuevoCaso(event)">
+                <div class="grid-form-2">
+                    <div>
+                        <label>Título / Delito del Caso:</label>
+                        <input type="text" id="nc-titulo" required placeholder="Ej. Sabotaje en el Laboratorio Central">
+                    </div>
+                    <div class="grid-form-2">
+                        <div>
+                            <label>Prioridad (Urgencia):</label>
+                            <select id="nc-prioridad">
+                                <option value="1">1 - Alta Urgencia</option>
+                                <option value="2">2 - Media Urgencia</option>
+                                <option value="3">3 - Baja Urgencia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>¿Quién es el Culpable Real?:</label>
+                            <select id="nc-culpable">
+                                <option value="0">Individuo #1</option>
+                                <option value="1">Individuo #2</option>
+                                <option value="2">Individuo #3</option>
+                                <option value="3">Individuo #4</option>
+                                <option value="4">Individuo #5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="subtitulo-form">👥 Los 5 Individuos en la Escena del Crimen (Noche y Juicio)</h4>
+                <div class="contenedor-individuos-form" id="campos-individuos-form">
+                    <!-- Generado dinamicamente por JS para los 5 individuos -->
+                </div>
+
+                <h4 class="subtitulo-form">🔍 Las 4 Pistas Forenses para la Pila (Noche)</h4>
+                <div class="grid-form-2">
+                    <input type="text" id="nc-pista0" required placeholder="Pista 1 (Fotografía Forense)">
+                    <input type="text" id="nc-pista1" required placeholder="Pista 2 (Objeto en la Escena)">
+                    <input type="text" id="nc-pista2" required placeholder="Pista 3 (Reporte de Laboratorio)">
+                    <input type="text" id="nc-pista3" required placeholder="Pista 4 (Registro Adicional)">
+                </div>
+
+                <div class="botones-form-modal">
+                    <button type="button" onclick="cargarPlantillaEjemplo()" class="btn-secundario">⚡ Autocompletar Ejemplo</button>
+                    <button type="submit" class="btn-guardar-caso">💾 Guardar e Insertar en Cola con Prioridad</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

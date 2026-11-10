@@ -1,0 +1,995 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 16px 22px;
+    min-height: 100vh;
+}
+
+.oculto {
+    display: none !important;
+}
+
+/* ENCABEZADO SUPERIOR */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 16px 22px;
+    border-radius: 12px;
+    border-left: 6px solid #3b82f6;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.titulo-central h1 {
+    font-size: 1.3rem;
+    color: #60a5fa;
+    letter-spacing: 0.5px;
+}
+
+.titulo-central p {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.acciones-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge-instancia {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.modo-noche {
+    background: #1e1b4b;
+    color: #a5b4fc;
+    border: 1px solid #6366f1;
+}
+
+.modo-dia {
+    background: #422006;
+    color: #fde047;
+    border: 1px solid #eab308;
+}
+
+.btn-menu-caso {
+    padding: 10px 16px;
+    background: #10b981;
+    color: #022c22;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-menu-caso:hover {
+    background: #059669;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* BANNER DE MENSAJES */
+.banner {
+    background: #1e3a8a;
+    color: #e0f2fe;
+    padding: 11px 18px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    font-weight: 600;
+    border: 1px solid #3b82f6;
+    font-size: 0.92rem;
+}
+
+/* BARRA COMPACTA: COLA CON PRIORIDAD Y DETECTIVES */
+.barra-estructuras {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.panel-compacto {
+    background: #1e293b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+}
+
+.cabecera-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+.cabecera-panel h2, .cabecera-panel h3 {
+    font-size: 0.98rem;
+    color: #f1f5f9;
+}
+
+.sub {
+    font-size: 0.76rem;
+    color: #94a3b8;
+}
+
+.ira-casos {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.card-caso {
+    min-width: 220px;
+    background: #0f172a;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border-left: 4px solid #64748b;
+    font-size: 0.82rem;
+}
+
+.card-caso.activo {
+    border-left-color: #ef4444;
+    background: #172554;
+}
+
+.badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.prio-1 { background: #dc2626; color: white; }
+.prio-2 { background: #d97706; color: white; }
+.prio-3 { background: #2563eb; color: white; }
+
+.ira-detectives {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.card-det {
+    background: #0f172a;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.8rem;
+}
+
+.card-det:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+/* ============================================================================
+   ESCENARIO GENERAL Y BOCETO 1: INSTANCIA DE NOCHE (INVESTIGADOR)
+   ============================================================================ */
+.escenario-juego {
+    background: #fdfbf7;
+    color: #1e293b;
+    border-radius: 14px;
+    padding: 20px;
+    border: 3px solid #334155;
+    background-image:
+        linear-gradient(to right, rgba(203, 213, 225, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.35) 1px, transparent 1px);
+    background-size: 24px 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+}
+
+.cabecera-escenario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+
+.cabecera-escenario h2 {
+    font-size: 1.1rem;
+    color: #93c5fd;
+}
+
+.cabecera-escenario p {
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    margin-top: 3px;
+}
+
+.contador-roles {
+    background: #0f172a;
+    color: #fbbf24;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border: 1px solid #475569;
+}
+
+/* Fila superior noche: Info del caso + Marco Foto Sospechoso (arriba a la derecha como en el boceto) */
+.fila-superior-noche {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 20px;
+    margin-bottom: 16px;
+    align-items: stretch;
+}
+
+.resumen-caso-noche {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #475569;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.resumen-caso-noche h3 {
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-size: 1.15rem;
+}
+
+.marco-foto-sospechoso {
+    background: #ffffff;
+    border: 3px solid #334155;
+    padding: 12px;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 4px 4px 0px #94a3b8;
+    position: relative;
+}
+
+.etiqueta-boceto {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.contenedor-retrato {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 8px auto;
+    border: 2px solid #64748b;
+    background: #fef9c3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.datos-inspeccionado {
+    font-size: 0.82rem;
+    color: #1e293b;
+}
+
+/* Tablero Mesa Noche (Boceto 1) */
+.tablero-mesa-noche {
+    border: 3px solid #1e293b;
+    background: rgba(255, 255, 255, 0.88);
+    padding: 20px;
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    position: relative;
+    padding-bottom: 95px;
+}
+
+.caja-contextos-noche {
+    border: 2px solid #334155;
+    padding: 14px;
+    background: #ffffff;
+}
+
+.titulo-caja-interna {
+    font-weight: 800;
+    font-size: 0.92rem;
+    margin-bottom: 10px;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+}
+
+.lista-individuos-boceto {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fila-individuo-boceto {
+    display: grid;
+    grid-template-columns: 28px 46px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #f8fafc;
+}
+
+.fila-individuo-boceto:hover {
+    border-color: #3b82f6;
+}
+
+.fila-individuo-boceto.inspeccionado {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.flecha-azul {
+    color: #2563eb;
+    font-weight: 900;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+/* Icono estilo boceto (Amarillo = Testigo, Naranja = Sospechoso) */
+.icono-peon {
+    width: 40px;
+    height: 46px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.peon-testigo {
+    background: #fef08a; /* Amarillo del boceto */
+}
+
+.peon-sospechoso {
+    background: #fdba74; /* Naranja del boceto */
+}
+
+.peon-cabeza {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #1e293b;
+    border-radius: 50%;
+}
+
+.peon-cuerpo {
+    width: 20px;
+    height: 16px;
+    border: 2px solid #1e293b;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    margin-top: 2px;
+}
+
+.texto-contexto-ind strong {
+    font-size: 0.9rem;
+    color: #0f172a;
+}
+
+.texto-contexto-ind p {
+    font-size: 0.8rem;
+    color: #334155;
+    margin-top: 2px;
+}
+
+.btn-rol-noche {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid #1e293b;
+    transition: 0.15s;
+}
+
+.btn-rol-noche.es-testigo {
+    background: #fef08a;
+    color: #713f12;
+}
+
+.btn-rol-noche.es-sospechoso {
+    background: #fb923c;
+    color: #431407;
+}
+
+/* Caja Derecha: Pistas (Boceto 1) */
+.caja-pistas-noche {
+    border: 2px solid #334155;
+    padding: 16px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.titulo-pistas-boceto {
+    color: #e11d48;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.sub-centrado {
+    font-size: 0.78rem;
+    color: #475569;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.figuras-pistas-boceto {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    min-height: 120px;
+    margin-bottom: 14px;
+    padding: 10px;
+}
+
+.figura-pista {
+    border: 2px solid #1e293b;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    cursor: not-allowed;
+    transition: 0.25s;
+    padding: 6px;
+}
+
+.figura-pista.revelada {
+    background: #bbf7d0;
+    border-color: #15803d;
+    color: #064e3b;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+}
+
+.figura-pista.revelada:hover {
+    transform: scale(1.08);
+}
+
+.forma-rectangulo {
+    width: 58px;
+    height: 96px;
+}
+
+.forma-rombo {
+    width: 74px;
+    height: 74px;
+    transform: rotate(45deg);
+}
+
+.forma-rombo span {
+    transform: rotate(-45deg);
+    display: block;
+}
+
+.forma-rombo.revelada:hover {
+    transform: rotate(45deg) scale(1.08);
+}
+
+.forma-cuadrado {
+    width: 76px;
+    height: 76px;
+}
+
+.btn-recolectar-pila {
+    width: 100%;
+    padding: 10px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
+.btn-recolectar-pila:hover {
+    background: #1d4ed8;
+}
+
+.pila-historial-box {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.nodo-pila-noche {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Circulo Jugador (Abajo al centro como en ambos bocetos) */
+.circulo-jugador-contenedor {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+.circulo-jugador {
+    width: 195px;
+    height: 98px;
+    background: #ffffff;
+    border: 3px solid #1e293b;
+    border-radius: 110px 110px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+    padding: 8px;
+}
+
+.circulo-jugador span {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.circulo-jugador small {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.btn-pasar-dia {
+    padding: 6px 12px;
+    background: #f59e0b;
+    color: #451a03;
+    border: 2px solid #1e293b;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-pasar-dia:hover {
+    background: #eab308;
+    transform: scale(1.05);
+}
+
+/* ============================================================================
+   BOCETO 2: INSTANCIA DE DÍA (JUZGADO PENAL - JUEZ)
+   ============================================================================ */
+.cabecera-dia {
+    background: #422006;
+    border-left: 6px solid #facc15;
+}
+
+.cabecera-dia h2 {
+    color: #fde047;
+}
+
+.indicador-turno-circular {
+    background: #fef08a;
+    color: #422006;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.84rem;
+    border: 2px solid #ca8a04;
+}
+
+/* Estrado de Personajes con Animacion de Movimiento al Frente */
+.estrado-personajes-dia {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 12px 30px 26px 30px;
+    min-height: 165px;
+}
+
+.grupo-estrado {
+    display: flex;
+    gap: 18px;
+    align-items: flex-end;
+}
+
+.personaje-sprite, .grupo-testigos-centro {
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    border: 2px solid rgba(30, 41, 59, 0.35);
+    position: relative;
+}
+
+/* Colores exactos del Boceto 2 */
+.color-naranja {
+    background: #fdba74; /* Sospechosos */
+}
+
+.color-azul {
+    background: #93c5fd; /* Abogado A */
+}
+
+.color-rosado {
+    background: #f9a8d4; /* Abogado B */
+}
+
+.grupo-testigos-centro {
+    background: #fef08a; /* Testigos */
+    flex-direction: column;
+}
+
+.trio-testigos {
+    display: flex;
+    gap: 8px;
+}
+
+/* Animacion de dar un paso al frente cuando el personaje habla */
+.personaje-al-frente {
+    transform: translateY(22px) scale(1.13);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    border: 3px solid #dc2626 !important;
+    z-index: 10;
+}
+
+.personaje-al-frente::after {
+    content: "🗣️ AL FRENTE";
+    position: absolute;
+    top: -12px;
+    background: #dc2626;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 99px;
+}
+
+.figura-humana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.cabeza-humana {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #1e293b;
+    border-radius: 50%;
+}
+
+.cuerpo-humano {
+    width: 38px;
+    height: 34px;
+    border: 3px solid #1e293b;
+    border-bottom: none;
+    border-radius: 18px 18px 0 0;
+    margin-top: 2px;
+}
+
+.mini-testigo .cabeza-humana { width: 20px; height: 20px; }
+.mini-testigo .cuerpo-humano { width: 26px; height: 24px; }
+
+.nombre-sprite {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.rol-sprite {
+    font-size: 0.72rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+/* Mesa del Juzgado y las 8 Cartas Probatorias (3, 2, 2, 1 | 1, 2, 2, 3) */
+.tablero-mesa-dia {
+    border: 3px solid #1e293b;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 22px 18px 95px 18px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.fila-cartas-juzgado {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.carta-juicio {
+    min-height: 155px;
+    border: 2px solid #1e293b;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.25s;
+    position: relative;
+    border-radius: 4px;
+}
+
+.carta-juicio:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.carta-juicio.bloqueada {
+    opacity: 0.55;
+    filter: grayscale(35%);
+}
+
+.carta-juicio.revelada {
+    outline: 3px solid #16a34a;
+}
+
+.carta-color-naranja { background: #fdba74; color: #431407; }
+.carta-color-azul { background: #93c5fd; color: #1e3a8a; }
+.carta-color-amarillo { background: #fef08a; color: #713f12; }
+.carta-color-rosado { background: #fbcfe8; color: #831843; }
+
+.texto-superior-carta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.numero-grande-carta {
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: #2563eb;
+    margin: 6px 0;
+}
+
+.estado-carta-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.75);
+    color: #0f172a;
+}
+
+/* Visor de la prueba activa al darle clic */
+.visor-prueba-activa {
+    background: #eff6ff;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+}
+
+.visor-prueba-activa h4 {
+    color: #1e3a8a;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.visor-prueba-activa p {
+    color: #1e293b;
+    font-size: 0.88rem;
+}
+
+/* Nota Roja Manuscrita del Boceto y Botones de Veredicto */
+.zona-veredicto-boceto {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.nota-roja-boceto {
+    color: #e11d48;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.botones-veredicto {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-veredicto {
+    padding: 10px 20px;
+    background: #e11d48;
+    color: white;
+    border: 2px solid #1e293b;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-veredicto:hover {
+    background: #be123c;
+    transform: scale(1.04);
+}
+
+/* Panel del Montículo Binario (Opción B) */
+.panel-monticulo {
+    margin-top: 18px;
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 14px 18px;
+    border-radius: 10px;
+}
+
+.lista-monticulo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.nodo-monticulo {
+    background: #0f172a;
+    border-left: 5px solid #f59e0b;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.nodo-monticulo.raiz-heap {
+    border-left-color: #ef4444;
+    background: #172554;
+}
+
+/* MODALES */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.modal-caja {
+    background: #1e293b;
+    color: #f8fafc;
+    border: 2px solid #475569;
+    border-radius: 12px;
+    padding: 22px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modal-grande {
+    max-width: 860px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.cabecera-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.btn-x {
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.btn-cerrar-modal {
+    margin-top: 16px;
+    width: 100%;
+    padding: 10px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* FORMULARIO DE NUEVO CASO */
+.grid-form-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.subtitulo-form {
+    margin: 14px 0 6px 0;
+    color: #60a5fa;
+    font-size: 0.92rem;
+}
+
+.fila-form-individuo {
+    background: #0f172a;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    margin-bottom: 8px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #f8fafc;
+    font-size: 0.82rem;
+    margin-top: 4px;
+}
+
+.botones-form-modal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.btn-secundario {
+    padding: 10px 16px;
+    background: #475569;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-guardar-caso {
+    padding: 10px 18px;
+    background: #10b981;
+    color: #022c22;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
