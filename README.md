@@ -24,7 +24,7 @@ g++ servidor.cpp -o servidor
 
 ### En Windows (MinGW / g++):
 ```cmd
-g++ servidor.cpp -o servidor.exe -lws2_32
+g++ -std=c++14 servidor.cpp -o servidor.exe -lws2_32
 servidor.exe
 ```
 
