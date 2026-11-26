@@ -1,31 +1,154 @@
-# Sistema de Investigación Forense y Juzgado Penal (Entrega 2)
+# Investigación Forense y Juzgado Penal — Entrega 2
 
-**Integrantes:**
-- Sebastian Chisaba Cruz
-- Ariadna Valentina Ramirez Santeliz
-- Jeronimo Pascuas Barroso
+![C++](https://img.shields.io/badge/C%2B%2B-14-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Platform](https://img.shields.io/badge/SO-Linux%20%7C%20Windows-2ea44f?style=for-the-badge)
 
-## Novedades de la Entrega 2
-1. **Soporte Multiplataforma (Linux y Windows):** El servidor HTTP en C++ (`servidor.cpp`) detecta automáticamente el sistema operativo mediante directivas `#ifdef _WIN32` para usar `Winsock2` en Windows o sockets POSIX en Linux.
-2. **Eliminación del Temporizador de 60s y Nuevo Creador de Casos:** Se eliminó la generación automática de casos cada 60 segundos y se incorporó el menú **"➕ Ingresar Nuevo Caso"** para introducir expedientes personalizados, contextos de los 5 individuos, pistas para la **pila** y argumentos del juicio.
-3. **Ciclo Jugable Noche (Investigador) y Día (Juez):**
-   - **Noche :** Evaluación de los 5 individuos con su contexto en la escena, marco de foto superior derecho, recolección de pistas en la **pila** y selección de **2 sospechosos** y **3 testigos**. Si el jugador pasa al Día sin haber incluido al verdadero culpable entre los 2 sospechosos, el sistema le notifica el fallo en la transición y reinicia la investigación nocturna.
-   - **Día :** Estrado con el Sospechoso A + Abogado A, los 3 Testigos, y el Sospechoso B + Abogado B (con animación de dar un paso al frente al presentar sus pruebas). Mesa con las 8 cartas probatorias (`3, 2, 2, 1 | 1, 2, 2, 3`) organizadas en un **Árbol**, turnos controlados por una **Cola Circular** (`1` Testigos -> `2` Abogados -> `3` Acusaciones) y ranking automático en tiempo real mediante un **Montículo Binario** (Opción B).
+Juego interactivo de deducción forense y simulación judicial desarrollado en **C++** (motor lógico y servidor HTTP por sockets) con interfaz web ligera, creado para la asignatura **Estructuras de Datos** de la Universidad Nacional de Colombia.
+
+> [!NOTE]
+> Toda la lógica algorítmica y el manejo de memoria se ejecutan en el servidor de C++ (`Estructuras.h` y `servidor.cpp`). La interfaz web (`index.html`, `styles.css`, `app.js`) actúa únicamente como capa visual compacta (`100vh` sin desplazamiento vertical), manteniendo las estructuras de datos invisibles para el jugador.
 
 ---
 
-## Cómo Compilar y Ejecutar
+## Tabla de Contenidos
 
-### En Linux:
+1. [Descripción General](#descripción-general)
+2. [Estructuras de Datos Implementadas](#estructuras-de-datos-implementadas)
+3. [Estructura del Proyecto](#estructura-del-proyecto)
+4. [Compilación y Ejecución](#compilación-y-ejecución)
+5. [Flujo de Juego (Noche y Día)](#flujo-de-juego-noche-y-día)
+6. [Endpoints del Servidor Local](#endpoints-del-servidor-local)
+7. [Documentación Adicional](#documentación-adicional)
+8. [Autores](#autores)
+
+---
+
+## Descripción General
+
+Cada partida se desarrolla en un ciclo continuo de dos actos:
+
+* **Fase Nocturna (Rol de Investigador):** El jugador asigna un detective, inspecciona retratos, contextos y coartadas de cinco implicados, recolecta hasta **2 evidencias forenses** y selecciona exactamente **2 sospechosos** para llevar a juicio (los 3 restantes pasan a ser testigos). Si el culpable real queda entre los testigos, el caso se reinicia en la noche.
+* **Fase Diurna (Rol de Juez):** En el estrado del tribunal se enfrentan los dos acusados con sus abogados defensores y el panel de tres testigos. El juez abre las **8 cartas probatorias** respetando tres fases procesales obligatorias, compara su peso incriminatorio en el panel lateral de relevancia y dicta sentencia. Al cerrar el último expediente, el servidor genera nuevos casos automáticamente para mantener la partida activa.
+
+---
+
+## Estructuras de Datos Implementadas
+
+Todas las estructuras fueron programadas desde cero en `Estructuras.h` con gestión manual de memoria dinámica y liberación en cascada mediante destructores.
+
+| Estructura | Clase / Registro | Entrega | Rol en el sistema | Complejidad Temporal | Complejidad Espacial |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| **Registros y arreglos fijos** | `Detective[4]`, `Individuo[15]` | 1 | Plantilla de detectives y catálogo de implicados | Acceso `O(1)` | `O(1)` |
+| **Cola con Prioridad** | `ColaPrioridadCasos` | 1 | Ordena los expedientes internos por nivel de urgencia (`1` a `3`) | Inserción `O(n)` / Extracción `O(1)` | `O(n)` |
+| **Pila dinámica (LIFO)** | `PilaEvidencias` | 1 | Almacena las pistas forenses recolectadas durante la noche | Apilar / Desapilar `O(1)` | `O(e)`, con `e <= 2` |
+| **Cola Circular de Coartadas** | `ColaCircularCoartadas` | 1 | Rota y reutiliza las coartadas entre los implicados de cada caso | Desencolar y rotar `O(1)` | `O(1)` (cap. 10) |
+| **Árbol Jerárquico** | `ArbolJuicio` | **2** | Modela el tribunal: raíz (expediente) -> 3 grupos -> 8 cartas probatorias | Construcción `O(V)` / Búsqueda `O(V)` | `O(V)`, con `V = 12` |
+| **Cola Circular de Turnos** | `ColaCircularTurnos` | **2** | Controla el orden procesal en 3 fases: Testigos -> Abogados -> Acusaciones | Consulta / Avance `O(1)` | `O(1)` (cap. 3) |
+| **Montículo Binario de Máximos** | `MonticuloBinario` | **2** | Ordena en vivo las pruebas abiertas según su puntaje incriminatorio | Inserción `O(log k)` / Ranking `O(k log k)` | `O(k)`, con `k <= 8` |
+
+> [!TIP]
+> Variables de análisis: `n` = casos en cola, `e` = evidencias apiladas en la noche (máx. 2), `V` = nodos del árbol del tribunal (12 fijos) y `k` = pruebas reveladas en el juzgado (máx. 8). Las complejidades espaciales corresponden al mínimo teórico necesario para almacenar los elementos.
+
+---
+
+## Estructura del Proyecto
+
+```text
+.
+├── Estructuras.h                   # Implementación de todas las estructuras de datos y lógica de casos
+├── servidor.cpp                    # Servidor HTTP multiplataforma (Winsock2 / POSIX) en el puerto 8081
+├── index.html                      # Interfaz gráfica compacta (Noche y Día en pantalla completa)
+├── styles.css                      # Diseño responsivo 100vh, animaciones del estrado y modales
+├── app.js                          # Cliente Fetch API, renderizado dinámico y validaciones visuales
+├── sprites/                        # Retratos ilustrados de personajes y abogados (.jpg / .png)
+│   ├── personaje_1.jpg
+│   ├── personaje_2.jpg
+│   ├── personaje_3.jpg
+│   ├── personaje_4.jpg
+│   ├── personaje_5.jpg
+│   ├── abogado_a.jpg
+│   └── abogado_b.jpg
+├── manual_de_usuario.pdf           # Guía paso a paso para jugar e instalar
+├── explicacion_estructuras_datos.pdf # Informe técnico: por qué y cómo se usa cada estructura
+└── README.md                       # Documentación principal del repositorio
+```
+
+---
+
+## Compilación y Ejecución
+
+### Requisitos
+* Compilador **g++** con soporte para **C++14** (GCC en Linux o MinGW/MSYS2 en Windows).
+* Navegador web moderno (Chrome, Firefox, Edge o Brave).
+* Puerto local **`8081`** disponible.
+
+### En Linux
+
 ```bash
-g++ servidor.cpp -o servidor
+g++ -std=c++14 servidor.cpp -o servidor
 ./servidor
 ```
 
-### En Windows (MinGW / g++):
-```cmd
+### En Windows (PowerShell)
+
+```powershell
 g++ -std=c++14 servidor.cpp -o servidor.exe -lws2_32
-servidor.exe
+.\servidor.exe
 ```
 
-Una vez iniciado el servidor en la terminal, abre el archivo `index.html` en tu navegador web.
+> [!IMPORTANT]
+> **Nota para Windows 11:** Si PowerShell muestra el error *"Una directiva de Control de aplicaciones bloqueó este archivo"* al ejecutar `.\servidor.exe`, se debe a que **Control inteligente de aplicaciones (Smart App Control)** bloquea ejecutables C++ recién compilados sin firma digital. Desactívalo en **Seguridad de Windows -> Control de aplicaciones y navegador -> Configuración de Control inteligente de aplicaciones**.
+
+### Abrir el juego
+1. Mantén abierta la terminal donde aparece `SERVIDOR DEL JUEGO ACTIVO EN: http://localhost:8081`.
+2. Abre `index.html` directamente en tu navegador (se recomienda pantalla completa con `F11`).
+
+---
+
+## Flujo de Juego (Noche y Día)
+
+1. **Asignar Detective:** Selecciona un detective disponible en la barra superior.
+2. **Investigar la Escena (Noche):** Haz clic en cada uno de los 5 implicados para revisar su retrato, coartada y rasgos; recolecta hasta **2 pistas forenses** con el botón **Recolectar Evidencia**.
+3. **Seleccionar Sospechosos:** Marca exactamente **2 sospechosos** y pulsa **Pasar al Día (Juzgado)**.
+4. **Dirigir la Audiencia (Día):** Abre las cartas en orden estricto:
+   * **Fase 1 (Amarillas):** Testimonios de los 3 testigos.
+   * **Fase 2 (Azules y Rosadas):** Evidencias de los abogados defensores.
+   * **Fase 3 (Naranjas):** Acusaciones cruzadas entre ambos sospechosos.
+5. **Dictar Sentencia:** Analiza el panel derecho **Pruebas Revisadas por Relevancia** y condena al culpable (es obligatorio abrir al menos una carta antes de emitir veredicto).
+
+---
+
+## Endpoints del Servidor Local
+
+El frontend se comunica con `servidor.cpp` en `http://localhost:8081` mediante respuestas JSON:
+
+| Método y Ruta | Acción en el Motor C++ |
+| :--- | :--- |
+| `GET /` | Retorna el estado completo actual en formato JSON |
+| `GET /asignar?id={0..3}` | Asigna un detective disponible al expediente activo |
+| `GET /evidencia` | Apila una nueva pista forense en `PilaEvidencias` (máx. 2) |
+| `GET /inspeccionar?idx={0..4}` | Muestra retrato, coartada y rasgos del individuo seleccionado |
+| `GET /alternar_sospechoso?idx={0..4}` | Alterna el rol entre Testigo y Sospechoso (máx. 2 sospechosos) |
+| `GET /pasar_dia` | Valida requisitos, construye `ArbolJuicio` e inicia la audiencia |
+| `GET /clic_carta?id={0..7}` | Valida fase en `ColaCircularTurnos`, revela carta e inserta en `MonticuloBinario` |
+| `GET /veredicto?idx={0..4}` | Evalúa sentencia, libera memoria del caso y avanza al siguiente expediente |
+
+---
+
+## Documentación Adicional
+
+* **Manual de Usuario:** Consulta `manual_de_usuario.pdf` para una guía visual detallada de uso y solución de errores comunes.
+* **Informe Técnico de Estructuras:** Consulta `explicacion_estructuras_datos.pdf` para el análisis profundo del por qué y el cómo de cada estructura, además de la gestión de memoria dinámica en el Heap.
+
+---
+
+## Autores
+
+* **Sebastian Chisaba Cruz**
+* **Ariadna Valentina Ramirez Santeliz**
+* **Jeronimo Pascuas Barroso**
+
+*Universidad Nacional de Colombia — Estructuras de Datos (2026)*
